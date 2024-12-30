@@ -24,7 +24,7 @@ const LandingPage = ()=>{
            <div className="landingMainContainer">
             <div>
            <h2><span style={{color:"#FF9839"}}>Connect</span> with your loved once</h2>
-           <p>Cover a distance by apna video call</p>
+           <p>Cover a distance by Zoom video call</p>
            <div role="button">
             <Link  className="btnGetStarted" to={"/auth "}>Get started
             </Link>

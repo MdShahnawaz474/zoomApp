@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
@@ -33,30 +32,5 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5"
-=======
-  "name": "backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dotenv": "^16.4.7",
-    "env": "^0.0.2",
-    "express": "^4.21.2",
-    "http-status": "^2.0.0",
-    "mongoose": "^8.9.2",
-    "nodemon": "^3.1.9",
-    "socket.io": "^4.8.1"
->>>>>>> 78c1e9c0907ec8e8fd3b4f22c9565e00e85913c7
   }
 }

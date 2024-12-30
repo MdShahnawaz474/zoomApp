@@ -20,6 +20,7 @@ const login = async (req, res) => {
 
         let isPasswordCorrect = await bcrypt.compare(password, user.password)
 
+
         if (isPasswordCorrect) {
             let token = crypto.randomBytes(20).toString("hex");
 
@@ -41,7 +42,7 @@ const register = async (req, res) => {
 
   if (!name || !username || !password) {
     return res.status(httpStatus.BAD_REQUEST).json({
-      message: "Please provide all required fields: name, username, and password",
+      message: "Please provide all required fields",
     });
   }
 

@@ -8,6 +8,8 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { AuthContext } from "../contexts/AuthContex";
+import { Snackbar } from "@mui/material";
 
 
 
@@ -49,33 +51,40 @@ const Authentication: React.FC = () => {
   const [message, setMessage] = React.useState<string>("");
   const [formState, setFormState] = React.useState<FormState>(0);
   const [open, setOpen] = React.useState<boolean>(false);
+  const {handleRegister,handleLogin} = React.useContext(AuthContext);
 
   // Handle authentication logic
-  const handleAuth = (): void => {
-    if (formState === 1 && !name.trim()) {
-      setError("Full name is required for registration.");
-      return;
+  const handleAuth =async ()=> {
+   try {
+    if(formState===0){
+      let result = await handleLogin(username,password);
+      setMessage(result);
+      setError("");
+      setOpen(true);
+      
     }
-    if (!username.trim() || !password.trim()) {
-      setError("Username and Password are required.");
-      return;
+    if(formState===1){
+      let result = await handleRegister(name,username,password)
+      setMessage(result);
+      console.log(result);
+      setUsername("");
+      setError("")
+      setFormState(0)
+      setPassword("")
+      
     }
-    setError("");
-
-    if (formState === 0) {
-      // Simulate login
-      setMessage("Login successful!");
-    } else {
-      // Simulate registration
-      setMessage("Registration successful!");
-    }
-    setOpen(true);
-    setUsername("");
-    setPassword("");
-    setName("");
+   } catch (err:any) {
+    console.log(err);
+      const errorMessage = err?.response?.data?.message || "Something went wrong!";
+      setError(errorMessage);
+      setMessage(""); // Clear success message
+      setOpen(true); // Show Snackbar;
+    
+    
+   }
   };
 
-  // Handle Snackbar close
+ 
  
 
   return (
@@ -188,7 +197,10 @@ const Authentication: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
-
+      <Snackbar open={open}
+        autoHideDuration={4000}
+        onClose={() => setOpen(false)} // Close the Snackbar after 4 seconds
+        message={message || error} />
    
     </ThemeProvider>
   );
