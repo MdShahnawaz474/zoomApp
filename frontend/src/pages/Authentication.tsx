@@ -8,39 +8,33 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { AuthContext } from "../contexts/AuthContex";
+import { useAuth } from "../contexts/AuthContex"; 
 import { Snackbar } from "@mui/material";
 
-
-
-type FormState = 0 | 1; 
-
-// const defaultTheme = createTheme();
+type FormState = 0 | 1;
 
 const blackTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     background: {
-      default: '#000000',
-      paper: '#000000',
+      default: "#000000",
+      paper: "#000000",
     },
     text: {
-      primary: '#ffffff',
-      secondary: '#b3b3b3',
+      primary: "#ffffff",
+      secondary: "#b3b3b3",
     },
     primary: {
-      main: '#bb86fc',
+      main: "#bb86fc",
     },
     secondary: {
-      main: '#ffffff',
+      main: "#ffffff",
     },
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: "Roboto, Arial, sans-serif",
   },
-
 });
-
 
 const Authentication: React.FC = () => {
   // State variables
@@ -51,41 +45,33 @@ const Authentication: React.FC = () => {
   const [message, setMessage] = React.useState<string>("");
   const [formState, setFormState] = React.useState<FormState>(0);
   const [open, setOpen] = React.useState<boolean>(false);
-  const {handleRegister,handleLogin} = React.useContext(AuthContext);
+  
+  // Access authentication functions from AuthContext
+  const { handleRegister, handleLogin } = useAuth(); 
 
   // Handle authentication logic
-  const handleAuth =async ()=> {
-   try {
-    if(formState===0){
-      let result = await handleLogin(username,password);
-      setMessage(result);
-      setError("");
-      setOpen(true);
-      
-    }
-    if(formState===1){
-      let result = await handleRegister(name,username,password)
-      setMessage(result);
-      console.log(result);
-      setUsername("");
-      setError("")
-      setFormState(0)
-      setPassword("")
-      
-    }
-   } catch (err:any) {
-    console.log(err);
-      const errorMessage = err?.response?.data?.message || "Something went wrong!";
-      setError(errorMessage);
+  const handleAuth = async () => {
+    try {
+      if (formState === 0) {
+        const result = await handleLogin(username, password);
+        setMessage(result);
+        setError("");
+        setOpen(true);
+      }
+      if (formState === 1) {
+        const result = await handleRegister(name, username, password);
+        setMessage(result);
+        setUsername("");
+        setError("");
+        setFormState(0);
+        setPassword("");
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Something went wrong!");
       setMessage(""); // Clear success message
-      setOpen(true); // Show Snackbar;
-    
-    
-   }
+      setOpen(true); // Show Snackbar
+    }
   };
-
- 
- 
 
   return (
     <ThemeProvider theme={blackTheme}>
@@ -98,12 +84,13 @@ const Authentication: React.FC = () => {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1733325600531-74f1899491a9?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
-            backgroundRepeat: 'no-repeat',
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1733325600531-74f1899491a9?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
+            backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
-                t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+              t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
         {/* Right Side Form */}
@@ -117,23 +104,15 @@ const Authentication: React.FC = () => {
               alignItems: "center",
             }}
           >
-            <Avatar style={{
-              marginBottom:"20px"
-            }} sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <Avatar style={{ marginBottom: "20px" }} sx={{ m: 1, bgcolor: "secondary.main" }}>
               <LockOutlinedIcon />
             </Avatar>
 
-            <div style={{gap:"2px"}}>
-              <Button
-                variant={formState === 0 ? "contained" : "text"}
-                onClick={() => setFormState(0)}
-              >
+            <div style={{ gap: "2px" }}>
+              <Button variant={formState === 0 ? "contained" : "text"} onClick={() => setFormState(0)}>
                 Sign In
               </Button>
-              <Button
-                variant={formState === 1 ? "contained" : "text"}
-                onClick={() => setFormState(1)}
-              >
+              <Button variant={formState === 1 ? "contained" : "text"} onClick={() => setFormState(1)}>
                 Sign Up
               </Button>
             </div>
@@ -149,9 +128,7 @@ const Authentication: React.FC = () => {
                   name="name"
                   value={name}
                   autoFocus
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setName(e.target.value)
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                 />
               )}
 
@@ -163,9 +140,7 @@ const Authentication: React.FC = () => {
                 label="Username"
                 name="username"
                 value={username}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setUsername(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -176,9 +151,7 @@ const Authentication: React.FC = () => {
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               />
 
               {error && <p style={{ color: "red" }}>{error}</p>}
@@ -187,9 +160,8 @@ const Authentication: React.FC = () => {
                 type="button"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2,bgcolor: "primary.main"  }}
+                sx={{ mt: 3, mb: 2, bgcolor: "primary.main" }}
                 onClick={handleAuth}
-              
               >
                 {formState === 0 ? "Login" : "Register"}
               </Button>
@@ -197,11 +169,12 @@ const Authentication: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
-      <Snackbar open={open}
+      <Snackbar
+        open={open}
         autoHideDuration={4000}
         onClose={() => setOpen(false)} // Close the Snackbar after 4 seconds
-        message={message || error} />
-   
+        message={message || error}
+      />
     </ThemeProvider>
   );
 };

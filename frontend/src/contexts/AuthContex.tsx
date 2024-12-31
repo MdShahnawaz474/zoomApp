@@ -1,35 +1,34 @@
 import axios from "axios";
 import httpStatus from "http-status";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-// import server from "../environment";
 
+type AuthContextType = {
+    userData: any; // Define a more specific type here if needed
+    setUserData: React.Dispatch<React.SetStateAction<any>>;
+    handleLogin: (username: string, password: string) => Promise<any>;
+    handleRegister: (name: string, username: string, password: string) => Promise<string>;
+};
 
-export const AuthContext = createContext({});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const client = axios.create({
-    baseURL:"http://localhost:8000/api/v1/users"
-})
+    baseURL: "http://localhost:8000/api/v1/users",
+});
 
+// Define the AuthProvider component that will wrap the application
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [userData, setUserData] = useState<any>(null); // Initialize user data state
+    const router = useNavigate(); // Use navigate hook for routing
 
-export const AuthProvider = ({ children }:any) => {
-
-    const authContext = useContext(AuthContext);
-
-
-    const [userData, setUserData] = useState(authContext);
-
-
-    const router = useNavigate();
-
-    const handleRegister = async (name:string, username:string, password:string) => {
+    // Handle user registration
+    const handleRegister = async (name: string, username: string, password: string) => {
         try {
-            let request = await client.post("/register", {
-                name: name,
-                username: username,
-                password: password
-            })
-
+            const request = await client.post("/register", {
+                name,
+                username,
+                password,
+            });
 
             if (request.status === httpStatus.CREATED) {
                 return request.data.message;
@@ -37,38 +36,43 @@ export const AuthProvider = ({ children }:any) => {
         } catch (err) {
             throw err;
         }
-    }
+    };
 
-    const handleLogin = async (username:string, password:string) => {
+    // Handle user login
+    const handleLogin = async (username: string, password: string) => {
         try {
-            let request = await client.post("/login", {
-                username: username,
-                password: password
+            const request = await client.post("/login", {
+                username,
+                password,
             });
-
-            console.log(username, password)
-            console.log(request.data)
 
             if (request.status === httpStatus.OK) {
                 localStorage.setItem("token", request.data.token);
-                router("/home")
+                setUserData(request.data); // Set the user data after successful login
+                router("/home"); // Redirect to home
+                return "Login successful!";
             }
         } catch (err) {
-            throw err;
+            throw err
         }
-    }
+    };
 
- 
-
-
+    // Return the context provider with all necessary values
     const data = {
-        userData, setUserData,handleRegister, handleLogin
+        userData,
+        setUserData,
+        handleRegister,
+        handleLogin,
+    };
+
+    return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
+};
+
+// Custom hook to use AuthContext easily in any component
+export const useAuth = (): AuthContextType => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
     }
-
-    return (
-        <AuthContext.Provider value={data}>
-            {children}
-        </AuthContext.Provider>
-    )
-
-}
+    return context;
+};
