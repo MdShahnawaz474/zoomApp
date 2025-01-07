@@ -114,8 +114,41 @@ function VideoMeet() {
     }
   }, [audio, videos]);
 
-  let gotMessageFromServer = (fromId: string, message: string) => {};
+  let gotMessageFromServer = (fromId: string, message: string) => {
+    let signal = JSON.parse(message);
 
+      if(fromId !== socketIdRef.current){
+        if(signal.sdp){
+          connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(()=>{
+            if(signal.sdp.type === "offer"){
+              connections[fromId].createAnswer().then((description:any)=>{
+                connections[fromId].setLocalDescription(description).then(()=>{
+                  socketIdRef.current.emit("signal", fromId, JSON.stringify({
+                    "sdp": connections[fromId].localDescription
+                  })
+                ).catch((e:any)=>{
+                  console.log(e);
+                }).catch((e:any)=>{
+                  console.log(e);
+                  
+                })
+                })
+              }).catch((e:any)=>{
+                console.log(e);
+                
+              })
+            }
+          }).catch((e:any)=>{
+            console.log(e);
+          })
+        }
+        if(signal.ice){
+          connections[fromId].addIceCandidate(new RTCIceCandidate(signal.ice)).catch((e:any) => console.log(e))
+        }
+      }
+  };
+
+  
   let connectToSocketServer = () => {
     socketRef.current = io(serverUrl, { secure: false });
 
@@ -191,7 +224,7 @@ function VideoMeet() {
               connections[id2].addStream(window.localstream);
             } catch (error) {
               connections[id2].createOffer().then((description :any )=>{
-                connections[id2].setLocalDescriptio(description) 
+                connections[id2].setLocalDescription(description) 
                 .then(()=>{
                   socketRef.current.emit("signal",id2 ,JSON.stringify({"sdp":connections[id2].localDescription}))
                 }).catch((e:any)=>console.log(e)
