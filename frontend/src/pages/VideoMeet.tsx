@@ -183,6 +183,24 @@ function VideoMeet() {
           }
           
         });
+        if (id === socketIdRef.current){
+          for (let id2 in connections){
+            if(id2 === socketIdRef.current) continue
+
+            try {
+              connections[id2].addStream(window.localstream);
+            } catch (error) {
+              connections[id2].createOffer().then((description :any )=>{
+                connections[id2].setLocalDescriptio(description) 
+                .then(()=>{
+                  socketRef.current.emit("signal",id2 ,JSON.stringify({"sdp":connections[id2].localDescription}))
+                }).catch((e:any)=>console.log(e)
+                )
+              })
+            }
+          }
+        }
+
       });
 
       
