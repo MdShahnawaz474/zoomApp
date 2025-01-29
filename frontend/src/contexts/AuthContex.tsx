@@ -9,8 +9,7 @@ type AuthContextType = {
     handleLogin: (username: string, password: string) => Promise<any>;
     handleRegister: (name: string, username: string, password: string) => Promise<string>;
 };
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+ export const AuthContext = createContext<AuthContextType>(null!);
 
 const client = axios.create({
     baseURL: "http://localhost:8000/api/v1/users",
@@ -57,12 +56,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const getHistoryOfUser = async () => {
+        try {
+            let request = await client.get("/get_all_activity", {
+                params: {
+                    token: localStorage.getItem("token")
+                }
+            });
+            return request.data
+        } catch
+         (err) {
+            throw err;
+        }
+    }
+
+    const addToUserHistory = async (meetingCode:string) => {
+        try {
+            let request = await client.post("/add_to_activity", {
+                token: localStorage.getItem("token"),
+                meeting_code: meetingCode
+            });
+            return request
+        } catch (e) {
+            throw e;
+        }
+    }
+
     // Return the context provider with all necessary values
     const data = {
-        userData,
-        setUserData,
-        handleRegister,
-        handleLogin,
+        userData, setUserData, addToUserHistory, getHistoryOfUser, handleRegister, handleLogin
     };
 
     return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
